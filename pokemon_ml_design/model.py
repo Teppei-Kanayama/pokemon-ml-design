@@ -1,14 +1,25 @@
+from abc import ABCMeta, abstractmethod
 from typing import List
 
+import numpy as np
 from obp.policy import IPWLearner
 from obp.types import BanditFeedback
 from sklearn.linear_model import LogisticRegression
 
 from pokemon_ml_design.actions import ACTIONS
 
-# TODO: 抽象クラスを作る
 
-class IPWModel:
+class BaseModel(metaclass=ABCMeta):
+    @abstractmethod
+    def fit(self, data: BanditFeedback) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def predict(self, context: np.ndarray) -> List[int]:
+        raise NotImplementedError
+
+
+class IPWModel(BaseModel):
     def __init__(self) -> None:
         self._model = IPWLearner(
             n_actions=len(ACTIONS),
@@ -17,11 +28,11 @@ class IPWModel:
 
     def fit(self, data: BanditFeedback) -> None:
         self._model.fit(
-            context=data["context"], # 特徴量
-            action=data["action"], # 過去の意思決定モデル\pi_bによる行動選択
-            reward=data["reward"], # 観測される目的変数
-            pscore=data["pscore"], # 過去の意思決定モデル\pi_bによる行動選択確率(傾向スコア)
+            context=data["context"],
+            action=data["action"],
+            reward=data["reward"],
+            pscore=data["pscore"],
         )
 
-    def predict(self, data: BanditFeedback) -> List[int]:  # TODO: contextだけ渡す
-        return self._model.predict(context=data["context"])
+    def predict(self, context: np.ndarray) -> List[int]:
+        return self._model.predict(context=context)

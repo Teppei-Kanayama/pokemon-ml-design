@@ -6,7 +6,7 @@ def main():
     training_data, validation_data = synthesize_data()
     ipw_model = IPWModel()
     ipw_model.fit(data=training_data)
-    action_choice_by_ipw_learner = ipw_model.predict(validation_data)
+    action_choice_by_ipw_learner = ipw_model.predict(validation_data['context'])
     evaluate(validation_data, action_choices=dict(IPW=action_choice_by_ipw_learner, IPW2=action_choice_by_ipw_learner))
 
 if __name__ == '__main__':
