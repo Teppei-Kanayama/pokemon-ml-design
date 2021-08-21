@@ -1,23 +1,12 @@
-from typing import Optional, Callable, Union
-
-import numpy as np
-import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from pathlib import Path
-
-from obp.dataset import (
-    SyntheticBanditDataset,
-    logistic_reward_function,
-    linear_behavior_policy
-)
-from obp.policy import IPWLearner, Random
+from obp.policy import IPWLearner
 from obp.ope import (
     OffPolicyEvaluation,
     RegressionModel,
     InverseProbabilityWeighting as IPS,
     DoublyRobust as DR
 )
-from obp.utils import softmax, sigmoid
+from pathlib import Path
+from sklearn.linear_model import LogisticRegression
 
 
 def evaluate(validation_data, action_choices, n_actions):
