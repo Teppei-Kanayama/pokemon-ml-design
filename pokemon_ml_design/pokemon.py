@@ -3,7 +3,7 @@ import pandas as pd
 
 # ポケモンの捕獲容易度と謝礼金を教えてくれるポケモン図鑑クラス
 class PokemonZukan:
-    def __init__(self):
+    def __init__(self) -> None:
         self._data = pd.read_csv('resources/input/pokemon.csv', index_col='id')
 
     def get_capture_dificulty(self, pokemon_id: int) -> int:

@@ -1,16 +1,14 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 from obp.dataset import SyntheticBanditDataset
 from obp.utils import sigmoid
+from obp.types import BanditFeedback
 import pandas as pd
 
 from pokemon_ml_design.actions import ACTIONS
 from pokemon_ml_design.pokemon import PokemonZukan
 from pokemon_ml_design.policy import rule_based_policy
-
-# TODO: type hint
-# TODO: shidoさんのやつを引用する
 
 
 # 連続値をポケモンIDに変換する関数
@@ -20,8 +18,8 @@ def _get_pokemon_id(x: float) -> int:
 
 
 def _reward_function(
-    context: np.ndarray,  # 特徴量ベクトル  # context.shape = (n_rounds, dim_context)
-    action_context: np.ndarray,  # 行動を表現するone-hotベクトル (n_actions, n_actions)次元の単位行列
+    context: np.ndarray,
+    action_context: np.ndarray,
     random_state: Optional[int] = None,
 ) -> np.ndarray:
 
@@ -43,8 +41,8 @@ def _reward_function(
 
 
 def _behavior_policy(
-    context: np.ndarray,  # 特徴量ベクトル  # context.shape = (n_rounds, dim_context)
-    action_context: np.ndarray,  # 行動を表現するone-hotベクトル (n_actions, n_actions)次元の単位行列
+    context: np.ndarray,
+    action_context: np.ndarray,
     random_state: Optional[int] = None,
 ) -> np.ndarray:
     pokemon_ids = _get_pokemon_id(context.flatten())
@@ -52,7 +50,7 @@ def _behavior_policy(
     return policy
 
 
-def _update_reward(data):
+def _update_reward(data: BanditFeedback) -> BanditFeedback:
     # 捕獲したかどうかのrewardになっている。
     # 捕獲した場合は謝礼金をもらえて、捕獲しなかった場合は何ももらえない
     # ボールのコストを差し引く
@@ -64,21 +62,15 @@ def _update_reward(data):
     return data
 
 
-def synthesize_data():
-    # `SyntheticBanditDataset`を用いて人工データを生成する
+def synthesize_data() -> Tuple[BanditFeedback, BanditFeedback]:
     dataset = SyntheticBanditDataset(
-        n_actions=5, # 人工データにおける行動の数  # 逃げる・モンスターボール・スーパーボール・ハイパーボール・マスターボール
-        dim_context=1, # 人工データにおける特徴量の次元数 # 今回はポケモンIDを生成するだけで良いので1とする。
-        reward_function=_reward_function, # 目的変数を生成する関数
-        behavior_policy_function=_behavior_policy, # 過去の意思決定モデル\pi_bによる行動選択確率を生成する関数
+        n_actions=len(ACTIONS),
+        dim_context=1,
+        reward_function=_reward_function,
+        behavior_policy_function=_behavior_policy,
         random_state=615,
     )
 
-    # トレーニングデータとバリデーションデータを生成する
-    print('train')  # TODO: printしない
     training_data = _update_reward(dataset.obtain_batch_bandit_feedback(n_rounds=1000))
-
-    print('validation')
     validation_data = _update_reward(dataset.obtain_batch_bandit_feedback(n_rounds=1000))
-
     return training_data, validation_data

@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 from obp.policy import IPWLearner
 from obp.ope import (
     OffPolicyEvaluation,
@@ -5,18 +7,22 @@ from obp.ope import (
     InverseProbabilityWeighting as IPS,
     DoublyRobust as DR
 )
+from obp.types import BanditFeedback
+
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
 
+from pokemon_ml_design.actions import ACTIONS
 
-def evaluate(validation_data, action_choices, n_actions):
+
+def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]):
     # TODO: 意味を理解する
     # TODO: 必要に応じて分離する
 
     # DR推定量に必要な目的変数予測モデルを得る
     # opeモジュールに実装されている`RegressionModel`に好みの機械学習手法を与えば良い
     regression_model = RegressionModel(
-        n_actions=n_actions, # 行動の数
+        n_actions=len(ACTIONS),
         base_model=LogisticRegression(C=100, random_state=12345, max_iter=1000), # ロジスティック回帰を使用
     )
 
