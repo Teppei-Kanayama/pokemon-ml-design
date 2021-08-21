@@ -6,7 +6,9 @@ from obp.policy import IPWLearner
 from obp.types import BanditFeedback
 from sklearn.linear_model import LogisticRegression
 
+from pokemon_ml_design.synthesize_data import get_pokemon_id
 from pokemon_ml_design.actions import ACTIONS
+from pokemon_ml_design.policy import rule_based_policy
 
 
 class BaseModel(metaclass=ABCMeta):
@@ -34,5 +36,23 @@ class IPWModel(BaseModel):
             pscore=data["pscore"],
         )
 
-    def predict(self, context: np.ndarray) -> List[int]:
+    def predict(self, context: np.ndarray) -> np.ndarray:
         return self._model.predict(context=context)
+
+
+class RuleBasedModel(BaseModel):
+    def __init__(self) -> None:
+        pass
+
+    def fit(self, data: BanditFeedback) -> None:
+        # 学習フェーズはない
+        pass
+
+    def predict(self, context: np.ndarray) -> np.ndarray:
+        pokemon_ids = get_pokemon_id(context.flatten())
+        predictions = []
+        for pokemon_id in pokemon_ids:
+            probabilities = rule_based_policy(pokemon_id)
+            prediction = np.random.multinomial(n=1, pvals=probabilities, size=1)[0]
+            predictions.append(prediction)
+        return  np.array(predictions)[:, :, np.newaxis]

@@ -15,7 +15,10 @@ from sklearn.linear_model import LogisticRegression
 from pokemon_ml_design.actions import ACTIONS
 
 
-def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]):
+# TODO;実測値ベースの評価も行う？
+
+
+def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -> None:
     # TODO: 意味を理解する
     # TODO: 必要に応じて分離する
 

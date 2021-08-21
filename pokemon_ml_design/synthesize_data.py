@@ -13,7 +13,7 @@ from pokemon_ml_design.policy import rule_based_policy
 
 # 連続値をポケモンIDに変換する関数
 # 現状のSyntheticBanditDatasetは整数値のcontextを生成できないので、暫定対応
-def _get_pokemon_id(x: float) -> int:
+def get_pokemon_id(x: float) -> int:
     return (x * 10 ** 5).astype(int) % 151 + 1
 
 
@@ -23,7 +23,7 @@ def _reward_function(
     random_state: Optional[int] = None,
 ) -> np.ndarray:
 
-    pokemon_ids = _get_pokemon_id(context.flatten())
+    pokemon_ids = get_pokemon_id(context.flatten())
     pokemon_zukan = PokemonZukan()
 
     capture_probabilities = []
@@ -45,7 +45,7 @@ def _behavior_policy(
     action_context: np.ndarray,
     random_state: Optional[int] = None,
 ) -> np.ndarray:
-    pokemon_ids = _get_pokemon_id(context.flatten())
+    pokemon_ids = get_pokemon_id(context.flatten())
     policy = np.array([rule_based_policy(pokemon_id) for pokemon_id in pokemon_ids])
     return policy
 
@@ -54,7 +54,7 @@ def _update_reward(data: BanditFeedback) -> BanditFeedback:
     # 捕獲したかどうかのrewardになっている。
     # 捕獲した場合は謝礼金をもらえて、捕獲しなかった場合は何ももらえない
     # ボールのコストを差し引く
-    pokemon_ids = _get_pokemon_id(data['context'].flatten())
+    pokemon_ids = get_pokemon_id(data['context'].flatten())
     pokemon_zukan = PokemonZukan()
     rewards = np.array([pokemon_zukan.get_reward(pokemon_id) for pokemon_id in pokemon_ids])
     costs = np.array([ACTIONS[action_id].cost for action_id in data['action'].flatten()])
