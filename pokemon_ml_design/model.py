@@ -26,12 +26,6 @@ class BaseModel(metaclass=ABCMeta):
 
 class IPWModel(BaseModel):
     def __init__(self) -> None:
-        # self._model = IPWLearner(
-        #     n_actions=len(ACTIONS),
-        #     # base_classifier=LogisticRegression(C=100, random_state=615, max_iter=1000)
-        #     # base_classifier=RandomForestClassifier(random_state=615)
-        #     base_classifier=SVC(gamma='auto', random_state=615)
-        # )
         self._model = NNPolicyLearner(
             n_actions=len(ACTIONS),
             dim_context=2,
@@ -41,19 +35,20 @@ class IPWModel(BaseModel):
         self._scaler = StandardScaler()
 
     def fit(self, data: BanditFeedback) -> None:
-        self._scaler.fit(data["context"])
-        scaled_context = self._scaler.transform(data["context"])
+        context = data["context"][:, 1:]
+        self._scaler.fit(context)
+        scaled_context = self._scaler.transform(context)
 
         self._model.fit(
-            context=scaled_context[:, 1:],  # TODO: リファクタ
+            context=scaled_context,
             action=data["action"],
             reward=data["reward"],
             pscore=data["pscore"],
         )
 
     def predict(self, context: np.ndarray) -> np.ndarray:
-        scaled_context = self._scaler.transform(context)
-        return self._model.predict(context=scaled_context[:, 1:])
+        scaled_context = self._scaler.transform(context[:, 1:])
+        return self._model.predict(context=scaled_context)
 
 
 class RuleBasedModel(BaseModel):
