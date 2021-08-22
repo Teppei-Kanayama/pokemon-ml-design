@@ -2,8 +2,9 @@ from abc import ABCMeta, abstractmethod
 from typing import List
 
 import numpy as np
-from obp.policy import IPWLearner
+from obp.policy import IPWLearner, NNPolicyLearner
 from obp.types import BanditFeedback
+from obp.ope import DirectMethod, InverseProbabilityWeighting
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -25,11 +26,17 @@ class BaseModel(metaclass=ABCMeta):
 
 class IPWModel(BaseModel):
     def __init__(self) -> None:
-        self._model = IPWLearner(
+        # self._model = IPWLearner(
+        #     n_actions=len(ACTIONS),
+        #     # base_classifier=LogisticRegression(C=100, random_state=615, max_iter=1000)
+        #     # base_classifier=RandomForestClassifier(random_state=615)
+        #     base_classifier=SVC(gamma='auto', random_state=615)
+        # )
+        self._model = NNPolicyLearner(
             n_actions=len(ACTIONS),
-            # base_classifier=LogisticRegression(C=100, random_state=615, max_iter=1000)
-            # base_classifier=RandomForestClassifier(random_state=615)
-            base_classifier=SVC(gamma='auto', random_state=615)
+            dim_context=2,
+            off_policy_objective=InverseProbabilityWeighting().estimate_policy_value_tensor,  # TODO: これはなに？
+            random_state=615
         )
         self._scaler = StandardScaler()
 

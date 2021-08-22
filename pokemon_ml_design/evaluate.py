@@ -63,6 +63,13 @@ def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -
         capture_dificulties[action_id].append(capture_dificulty)
         rewards[action_id].append(reward)
 
+    fig = plt.figure(figsize = (8, 20))
+    ax = fig.add_subplot(111)
+    ax.axhline(ACTIONS[1].cost, ls = "-.", color = "magenta")
+    ax.axhline(ACTIONS[2].cost, ls = "-.", color = "magenta")
+    ax.axhline(ACTIONS[3].cost, ls = "-.", color = "magenta")
+    ax.axhline(ACTIONS[4].cost, ls = "-.", color = "magenta")
+
     for i, action in enumerate(ACTIONS):
         print(i, len(capture_dificulties[i]))
         plt.scatter(capture_dificulties[i], rewards[i], label=i)  # TODO:　action.labelを使う
