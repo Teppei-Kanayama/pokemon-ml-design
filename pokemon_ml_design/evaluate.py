@@ -1,5 +1,8 @@
+from collections import defaultdict
 from typing import Dict, List
 
+import numpy as np
+import matplotlib.pyplot as plt
 from obp.policy import IPWLearner
 from obp.ope import (
     OffPolicyEvaluation,
@@ -13,9 +16,8 @@ from pathlib import Path
 from sklearn.linear_model import LogisticRegression
 
 from pokemon_ml_design.actions import ACTIONS
-
-
-# TODO;実測値ベースの評価も行う？
+from pokemon_ml_design.pokemon import PokemonZukan
+from pokemon_ml_design.synthesize_data import get_pokemon_id
 
 
 def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -> None:
@@ -49,5 +51,25 @@ def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -
         action_dist_list=list(action_choices.values()),
         estimated_rewards_by_reg_model=estimated_rewards_by_reg_model, # DR推定量に必要な期待報酬推定値
         random_state=12345,
-        fig_dir=Path("./resources/output/"),
+        fig_dir=Path('./resources/output/'),
     )
+    plt.clf()
+
+    pokemon_zukan = PokemonZukan()
+    capture_dificulties = defaultdict(list)
+    rewards = defaultdict(list)
+    for action, context in zip(action_choices['IPW'], validation_data['context'].flatten()):
+        pokemon_id = get_pokemon_id(context)
+        capture_dificulty = pokemon_zukan.get_capture_dificulty(pokemon_id)
+        reward = pokemon_zukan.get_reward(pokemon_id)
+        action_id = np.argmax(action)
+
+        capture_dificulties[action_id].append(capture_dificulty)
+        rewards[action_id].append(reward)
+
+    for i, action in enumerate(ACTIONS):
+        print(i, len(capture_dificulties[i]))
+        plt.scatter(capture_dificulties[i], rewards[i], label=i)  # TODO:　action.labelを使う
+    plt.legend()
+    plt.savefig('./resources/output/scatter.png')
+    plt.clf()

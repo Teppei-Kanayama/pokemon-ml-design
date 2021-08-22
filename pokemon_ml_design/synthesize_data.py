@@ -58,7 +58,7 @@ def _update_reward(data: BanditFeedback) -> BanditFeedback:
     pokemon_zukan = PokemonZukan()
     rewards = np.array([pokemon_zukan.get_reward(pokemon_id) for pokemon_id in pokemon_ids])
     costs = np.array([ACTIONS[action_id].cost for action_id in data['action'].flatten()])
-    data['reward'] = rewards * data['reward'] - costs
+    data['reward'] = rewards * data['reward'] * 100 - costs
     return data
 
 
