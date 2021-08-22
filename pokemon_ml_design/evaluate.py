@@ -16,8 +16,6 @@ from pathlib import Path
 from sklearn.linear_model import LogisticRegression
 
 from pokemon_ml_design.actions import ACTIONS
-from pokemon_ml_design.pokemon import PokemonZukan
-from pokemon_ml_design.synthesize_data import get_pokemon_id
 
 
 def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -> None:
@@ -55,13 +53,11 @@ def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -
     )
     plt.clf()
 
-    pokemon_zukan = PokemonZukan()
     capture_dificulties = defaultdict(list)
     rewards = defaultdict(list)
-    for action, context in zip(action_choices['IPW'], validation_data['context'].flatten()):
-        pokemon_id = get_pokemon_id(context)
-        capture_dificulty = pokemon_zukan.get_capture_dificulty(pokemon_id)
-        reward = pokemon_zukan.get_reward(pokemon_id)
+    for action, context in zip(action_choices['IPW'], validation_data['context']):
+        capture_dificulty = context[1]
+        reward = context[2]
         action_id = np.argmax(action)
 
         capture_dificulties[action_id].append(capture_dificulty)

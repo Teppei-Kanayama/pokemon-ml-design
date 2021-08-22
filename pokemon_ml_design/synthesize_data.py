@@ -12,7 +12,7 @@ from pokemon_ml_design.policy import rule_based_policy
 
 
 # 連続値をポケモンIDに変換する関数
-# 現状のSyntheticBanditDatasetは整数値のcontextを生成できないので、暫定対応
+# TODO: provate関数にして良さそう
 def get_pokemon_id(x: float) -> int:
     return (x * 10 ** 5).astype(int) % 151 + 1
 
@@ -49,27 +49,41 @@ def _behavior_policy(
     return policy
 
 
-def _update_reward(data: BanditFeedback) -> BanditFeedback:
-    # 捕獲したかどうかのrewardになっている。
-    # 捕獲した場合は謝礼金をもらえて、捕獲しなかった場合は何ももらえない
-    # ボールのコストを差し引く
+# 現状のSyntheticBanditDatasetは整数値のcontextを生成できないので、暫定的に後処理でcontextを追加する
+def _update_context(data: BanditFeedback) -> BanditFeedback:
     pokemon_ids = get_pokemon_id(data['context'].flatten())
     pokemon_zukan = PokemonZukan()
     rewards = np.array([pokemon_zukan.get_reward(pokemon_id) for pokemon_id in pokemon_ids])
+    capture_dificulties = np.array([pokemon_zukan.get_capture_dificulty(pokemon_id) for pokemon_id in pokemon_ids])
+
+    new_context = np.concatenate([pokemon_ids[:, np.newaxis], capture_dificulties[:, np.newaxis], rewards[:, np.newaxis]], axis=1)
+    data['context'] = new_context
+    return data
+
+
+# 現状、捕獲したかどうかのrewardになっているので、
+# 「捕獲した場合は謝礼金をもらえて、捕獲しなかった場合は何ももらえない」「ボールのコストを差し引く」を考慮したrewardにする
+def _update_reward(data: BanditFeedback) -> BanditFeedback:
+    rewards = data['context'][:, 2]
     costs = np.array([ACTIONS[action_id].cost for action_id in data['action'].flatten()])
-    data['reward'] = rewards * data['reward'] * 100 - costs
+    data['reward'] = rewards * data['reward'] - costs
+    return data
+
+
+def _post_process(data: BanditFeedback) -> BanditFeedback:
+    data = _update_context(data)
+    data = _update_reward(data)
     return data
 
 
 def synthesize_data() -> Tuple[BanditFeedback, BanditFeedback]:
     dataset = SyntheticBanditDataset(
         n_actions=len(ACTIONS),
-        dim_context=1,
+        dim_context=1,  # pokemon_idの元になるfloat値を生成する
         reward_function=_reward_function,
         behavior_policy_function=_behavior_policy,
         random_state=615,
     )
-
-    training_data = _update_reward(dataset.obtain_batch_bandit_feedback(n_rounds=10000))
-    validation_data = _update_reward(dataset.obtain_batch_bandit_feedback(n_rounds=1000))
+    training_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=10000))
+    validation_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=1000))
     return training_data, validation_data
