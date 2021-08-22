@@ -6,6 +6,8 @@ from obp.policy import IPWLearner
 from obp.types import BanditFeedback
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 
 from pokemon_ml_design.actions import ACTIONS
 from pokemon_ml_design.policy import rule_based_policy
@@ -25,7 +27,9 @@ class IPWModel(BaseModel):
     def __init__(self) -> None:
         self._model = IPWLearner(
             n_actions=len(ACTIONS),
-            base_classifier=LogisticRegression(C=100, random_state=615, max_iter=1000)
+            # base_classifier=LogisticRegression(C=100, random_state=615, max_iter=1000)
+            # base_classifier=RandomForestClassifier(random_state=615)
+            base_classifier=SVC(gamma='auto', random_state=615)
         )
         self._scaler = StandardScaler()
 
