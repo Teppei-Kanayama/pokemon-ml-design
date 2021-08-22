@@ -10,7 +10,6 @@ def rule_based_policy(pokemon_id: int) -> Tuple:
     reward = pokemon_zukan.get_reward(pokemon_id)
     name = pokemon_zukan.get_name(pokemon_id)
 
-    # TODO: もう少し練る
     if name == 'ミュウツー':
         return 0, 0, 0, 0.2, 0.8
 
