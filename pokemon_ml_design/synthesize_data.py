@@ -36,6 +36,10 @@ def _reward_function(
             l.append(capture_probability)
         capture_probabilities.append(l)
     capture_probabilities = np.array(capture_probabilities)
+
+    for i in range(5):
+        print(i, capture_probabilities[:, i].mean())
+
     return capture_probabilities
 
 
@@ -86,4 +90,5 @@ def synthesize_data() -> Tuple[BanditFeedback, BanditFeedback]:
     )
     training_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=10000))
     validation_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=1000))
+
     return training_data, validation_data

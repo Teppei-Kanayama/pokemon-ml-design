@@ -4,6 +4,7 @@ from typing import List
 import numpy as np
 from obp.policy import IPWLearner
 from obp.types import BanditFeedback
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
 from pokemon_ml_design.actions import ACTIONS
@@ -24,19 +25,24 @@ class IPWModel(BaseModel):
     def __init__(self) -> None:
         self._model = IPWLearner(
             n_actions=len(ACTIONS),
-            base_classifier=LogisticRegression(C=100, random_state=615, max_iter=10000)
+            base_classifier=LogisticRegression(C=100, random_state=615, max_iter=1000)
         )
+        self._scaler = StandardScaler()
 
     def fit(self, data: BanditFeedback) -> None:
+        self._scaler.fit(data["context"])
+        scaled_context = self._scaler.transform(data["context"])
+
         self._model.fit(
-            context=data["context"],
+            context=scaled_context[:, 1:],  # TODO: リファクタ
             action=data["action"],
             reward=data["reward"],
             pscore=data["pscore"],
         )
 
     def predict(self, context: np.ndarray) -> np.ndarray:
-        return self._model.predict(context=context)
+        scaled_context = self._scaler.transform(context)
+        return self._model.predict(context=scaled_context[:, 1:])
 
 
 class RuleBasedModel(BaseModel):
