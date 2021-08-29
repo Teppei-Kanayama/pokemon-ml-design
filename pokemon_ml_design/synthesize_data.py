@@ -89,6 +89,6 @@ def synthesize_data() -> Tuple[BanditFeedback, BanditFeedback]:
         random_state=615,
     )
     training_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=50000))
-    validation_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=1000))
+    validation_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=50000))
 
     return training_data, validation_data

@@ -11,7 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 
 from pokemon_ml_design.actions import ACTIONS
-from pokemon_ml_design.policy import rule_based_policy
+from pokemon_ml_design.policy import rule_based_policy, deterministic_rule_based_policy
 
 
 class BaseModel(metaclass=ABCMeta):
@@ -66,4 +66,21 @@ class RuleBasedModel(BaseModel):
             probabilities = rule_based_policy(pokemon_id)
             prediction = np.random.multinomial(n=1, pvals=probabilities, size=1)[0]
             predictions.append(prediction)
+        return  np.array(predictions)[:, :, np.newaxis]
+
+
+class DeterministicRuleBasedModel(BaseModel):
+    def __init__(self) -> None:
+        pass
+
+    def fit(self, data: BanditFeedback) -> None:
+        # 学習フェーズはない
+        pass
+
+    def predict(self, context: np.ndarray) -> np.ndarray:
+        pokemon_ids = context[:, 0]
+        predictions = []
+        for pokemon_id in pokemon_ids:
+            prediction = deterministic_rule_based_policy(pokemon_id)
+            predictions.append(np.array(prediction))
         return  np.array(predictions)[:, :, np.newaxis]
