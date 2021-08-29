@@ -63,16 +63,16 @@ def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -
         capture_dificulties[action_id].append(capture_dificulty)
         rewards[action_id].append(reward)
 
-    fig = plt.figure(figsize = (8, 20))
+    fig = plt.figure(figsize = (8, 12))
     ax = fig.add_subplot(111)
-    ax.axhline(ACTIONS[1].cost, ls = "-.", color = "magenta")
-    ax.axhline(ACTIONS[2].cost, ls = "-.", color = "magenta")
-    ax.axhline(ACTIONS[3].cost, ls = "-.", color = "magenta")
-    ax.axhline(ACTIONS[4].cost, ls = "-.", color = "magenta")
+
+    ax.axhline(ACTIONS[4].cost, ls = "-.", color = "magenta")  # マスターボールの価格にラインを引く
 
     for i, action in enumerate(ACTIONS):
         print(i, len(capture_dificulties[i]))
-        plt.scatter(capture_dificulties[i], rewards[i], label=i)  # TODO:　action.labelを使う
-    plt.legend()
+        plt.scatter(capture_dificulties[i], rewards[i], label=action.label_en, c=action.color, marker=action.marker)
+    plt.legend(fontsize='xx-large')
+    plt.xlabel('Capture difficulty')
+    plt.ylabel('Reward')
     plt.savefig('./resources/output/scatter.png')
     plt.clf()

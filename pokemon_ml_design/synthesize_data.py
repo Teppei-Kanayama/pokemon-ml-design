@@ -88,7 +88,7 @@ def synthesize_data() -> Tuple[BanditFeedback, BanditFeedback]:
         behavior_policy_function=_behavior_policy,
         random_state=615,
     )
-    training_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=50000))
-    validation_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=50000))
+    training_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=500))
+    validation_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=500))
 
     return training_data, validation_data
