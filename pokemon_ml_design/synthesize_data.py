@@ -36,10 +36,6 @@ def _reward_function(
             l.append(capture_probability)
         capture_probabilities.append(l)
     capture_probabilities = np.array(capture_probabilities)
-
-    for i in range(5):
-        print(i, capture_probabilities[:, i].mean())
-
     return capture_probabilities
 
 
