@@ -19,7 +19,7 @@ from sklearn.linear_model import LogisticRegression
 from pokemon_ml_design.actions import ACTIONS
 
 
-def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -> None:
+def validate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -> None:
     # 意思決定モデルの性能評価を一気通貫で行うための`OffPolicyEvaluation`を定義する
     ope = OffPolicyEvaluation(
         bandit_feedback=validation_data, # バリデーションデータ
@@ -60,7 +60,9 @@ def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -
     plt.savefig('./resources/output/scatter.png')
     plt.clf()
 
-    # groud truth
+
+def evaluate(test_data: BanditFeedback, action_choices: Dict[str, List]) -> None:
     for model_name, action_choice in action_choices.items():
-        ground_truth_score = SyntheticBanditDataset(2).calc_ground_truth_policy_value(expected_reward=validation_data['expected_reward'], action_dist=action_choice)
+        # 現状calc_ground_truth_policy_valueがSyntheticBanditDatasetのinstance methodになっているので、SyntheticBanditDatasetを適当な初期値でinstance化している。
+        ground_truth_score = SyntheticBanditDataset(2).calc_ground_truth_policy_value(expected_reward=test_data['expected_reward'], action_dist=action_choice)
         print(f'{model_name}: {ground_truth_score}')
