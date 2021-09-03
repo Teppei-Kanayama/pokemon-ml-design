@@ -71,9 +71,17 @@ def _update_reward(data: BanditFeedback) -> BanditFeedback:
     return data
 
 
+def _update_expected_reward(data: BanditFeedback) -> BanditFeedback:
+    rewards = data['context'][:, 2]
+    costs = np.array([action.cost for action in ACTIONS])
+    data['expected_reward'] = rewards[:, np.newaxis] * data['expected_reward'] - costs[np.newaxis, :]
+    return data
+
+
 def _post_process(data: BanditFeedback) -> BanditFeedback:
     data = _update_context(data)
     data = _update_reward(data)
+    data = _update_expected_reward(data)
     return data
 
 
@@ -87,5 +95,4 @@ def synthesize_data() -> Tuple[BanditFeedback, BanditFeedback]:
     )
     training_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=500))
     validation_data = _post_process(dataset.obtain_batch_bandit_feedback(n_rounds=500))
-
     return training_data, validation_data
