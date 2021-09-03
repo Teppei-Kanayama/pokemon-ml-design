@@ -66,6 +66,7 @@ def _update_context(data: BanditFeedback) -> BanditFeedback:
 def _update_reward(data: BanditFeedback) -> BanditFeedback:
     rewards = data['context'][:, 2]
     costs = np.array([ACTIONS[action_id].cost for action_id in data['action'].flatten()])
+    data['binary_reward'] = data['reward']
     data['reward'] = rewards * data['reward'] - costs
     return data
 

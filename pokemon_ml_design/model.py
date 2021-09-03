@@ -42,6 +42,7 @@ class IPWModel(BaseModel):
         self._model.fit(
             context=scaled_context,
             action=data["action"],
+            # reward=data["binary_reward"],
             reward=data["reward"],
             pscore=data["pscore"],
         )
