@@ -11,6 +11,7 @@ from obp.ope import (
     DoublyRobust as DR
 )
 from obp.types import BanditFeedback
+from obp.dataset import SyntheticBanditDataset
 
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
@@ -34,6 +35,7 @@ def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -
     )
     plt.clf()
 
+    # 可視化
     capture_dificulties = defaultdict(list)
     rewards = defaultdict(list)
     for action, context in zip(action_choices['IPW'], validation_data['context']):
@@ -57,3 +59,8 @@ def evaluate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -
     plt.ylabel('Reward')
     plt.savefig('./resources/output/scatter.png')
     plt.clf()
+
+    # groud truth
+    for model_name, action_choice in action_choices.items():
+        ground_truth_score = SyntheticBanditDataset(2).calc_ground_truth_policy_value(expected_reward=validation_data['expected_reward'], action_dist=action_choice)
+        print(f'{model_name}: {ground_truth_score}')
