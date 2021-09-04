@@ -20,13 +20,11 @@ from pokemon_ml_design.actions import ACTIONS
 
 
 def validate(validation_data: BanditFeedback, action_choices: Dict[str, List]) -> None:
-    # 意思決定モデルの性能評価を一気通貫で行うための`OffPolicyEvaluation`を定義する
     ope = OffPolicyEvaluation(
         bandit_feedback=validation_data, # バリデーションデータ
         ope_estimators=[IPS(estimator_name="IPS")] # 使用する推定量
     )
 
-    # IPWLearner+ロジスティック回帰の性能をIPS推定量とDR推定量で評価
     ope.visualize_off_policy_estimates_of_multiple_policies(
         policy_name_list=list(action_choices.keys()),
         action_dist_list=list(action_choices.values()),

@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 from obp.policy import IPWLearner, NNPolicyLearner
 from obp.types import BanditFeedback
-from obp.ope import DirectMethod, InverseProbabilityWeighting
+from obp.ope import DirectMethod, InverseProbabilityWeighting as IPS
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -29,7 +29,7 @@ class IPWModel(BaseModel):
         self._model = NNPolicyLearner(
             n_actions=len(ACTIONS),
             dim_context=2,
-            off_policy_objective=InverseProbabilityWeighting().estimate_policy_value_tensor,  # TODO: これはなに？
+            off_policy_objective=IPS().estimate_policy_value_tensor,
             random_state=615
         )
         self._scaler = StandardScaler()

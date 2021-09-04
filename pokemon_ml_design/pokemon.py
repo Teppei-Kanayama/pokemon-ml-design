@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-# ポケモンの捕獲容易度と謝礼金を教えてくれるポケモン図鑑クラス
+# ポケモンの捕獲難度と謝礼金を教えてくれるポケモン図鑑クラス
 class PokemonZukan:
     def __init__(self) -> None:
         self._data = pd.read_csv('resources/input/pokemon.csv', index_col='id')
