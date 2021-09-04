@@ -12,8 +12,7 @@ from pokemon_ml_design.policy import rule_based_policy
 
 
 # 連続値をポケモンIDに変換する関数
-# TODO: provate関数にして良さそう
-def get_pokemon_id(x: float) -> int:
+def _get_pokemon_id(x: float) -> int:
     return (x * 10 ** 5).astype(int) % 151 + 1
 
 
@@ -23,7 +22,7 @@ def _reward_function(
     random_state: Optional[int] = None,
 ) -> np.ndarray:
 
-    pokemon_ids = get_pokemon_id(context.flatten())
+    pokemon_ids = _get_pokemon_id(context.flatten())
     pokemon_zukan = PokemonZukan()
 
     capture_probabilities = []
@@ -44,14 +43,14 @@ def _behavior_policy(
     action_context: np.ndarray,
     random_state: Optional[int] = None,
 ) -> np.ndarray:
-    pokemon_ids = get_pokemon_id(context.flatten())
+    pokemon_ids = _get_pokemon_id(context.flatten())
     policy = np.array([rule_based_policy(pokemon_id) for pokemon_id in pokemon_ids])
     return policy
 
 
 # 現状のSyntheticBanditDatasetは整数値のcontextを生成できないので、暫定的に後処理でcontextを追加する
 def _update_context(data: BanditFeedback) -> BanditFeedback:
-    pokemon_ids = get_pokemon_id(data['context'].flatten())
+    pokemon_ids = _get_pokemon_id(data['context'].flatten())
     pokemon_zukan = PokemonZukan()
     rewards = np.array([pokemon_zukan.get_reward(pokemon_id) for pokemon_id in pokemon_ids])
     capture_dificulties = np.array([pokemon_zukan.get_capture_dificulty(pokemon_id) for pokemon_id in pokemon_ids])
